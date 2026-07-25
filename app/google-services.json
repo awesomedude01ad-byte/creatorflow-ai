@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "119522713959",
+    "project_id": "creatorflowai-2f6c3",
+    "storage_bucket": "creatorflowai-2f6c3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:119522713959:android:71a7fb804c7d26d9a24fc2",
+        "android_client_info": {
+          "package_name": "com.creatorflow.ai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCpKsl1EyNoFWWnLzQ2aTXONwCssEnU_zw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
