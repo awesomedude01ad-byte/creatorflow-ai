@@ -40,7 +40,22 @@ jobs:
           if [ -z "$SP" ]; then SP="creatorflow123"; fi
           if [ -z "$KP" ]; then KP="creatorflow123"; fi
           keytool -genkey -v              -keystore release.keystore             -alias upload             -keyalg RSA             -keysize 2048             -validity 10000             -storepass "$SP"             -keypass "$KP"             -dname "CN=CreatorFlow"
+            - name: Print SHA-1 Fingerprint
+        env:
+          STORE_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASS: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          SP="${STORE_PASS}"
+          KP="${KEY_PASS}"
+          if [ -z "$SP" ]; then SP="creatorflow123"; fi
+          if [ -z "$KP" ]; then KP="creatorflow123"; fi
 
+          keytool -list -v \
+            -keystore release.keystore \
+            -alias upload \
+            -storepass "$SP" \
+            -keypass "$KP" | grep "SHA1"
+         
       - name: Build AAB
         run: ./gradlew bundleProdRelease
 
