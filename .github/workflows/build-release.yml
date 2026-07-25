@@ -1,14 +1,22 @@
 name: CreatorFlow AI — Build Release
 
 on:
-  push:
-    branches: [main, master]
-    tags: ['v']
   workflow_dispatch:
+  push:
+    tags: ['v']
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      ANDROID_KEY_ALIAS: creatorflow-key
+      ANDROID_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -30,65 +38,68 @@ jobs:
           curl -sL -o gradle/wrapper/gradle-wrapper.jar "https://raw.githubusercontent.com/gradle/gradle/v8.9.0/gradle/wrapper/gradle-wrapper.jar"
           chmod +x gradlew
 
-      - name: Create Keystore
+      - name: Generate Release Keystore
         env:
           STORE_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_PASS: ${{ secrets.KEY_PASSWORD }}
+          KEY_PAST: ${{ secrets.KEY_PASSWORD }}
         run: |
           SP="${STORE_PASS}"
           KP="${KEY_PASS}"
-
           if [ -z "$SP" ]; then SP="creatorflow123"; fi
           if [ -z "$KP" ]; then KP="creatorflow123"; fi
-
-          keytool -genkeypair \
+          echo "ANDROID_KEY_PASSWORD=$KP" >> $GITHUB_ENV
+          echo "ANDROID_KEYSTORE_PASSWORD=$SP" >> $GITHUB_ENV
+          keytool -genkey -v \
             -keystore release.keystore \
-            -alias upload \
+            -alias creatorflow-key \
             -keyalg RSA \
             -keysize 2048 \
             -validity 10000 \
             -storepass "$SP" \
             -keypass "$KP" \
-            -dname "CN=CreatorFlow"
+            -dname "CN=CreatorFlow, OU=CreatorFlow Labs, O=CreatorFlow, L=Mumbai, ST=Maharashtra, C=IN"
 
-      - name: Print SHA-1 Fingerprint
-        env:
-          STORE_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_PASS: ${{ secrets.KEY_PASSWORD }}
+      - name: Create google-services.json
         run: |
-          SP="${STORE_PASS}"
-          KP="${KEY_PASS}"
+          cat > app/google-services.json << 'JSONEOF'
+          {
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "creatorflow-ai-placeholder",
+              "storage_bucket": "creatorflow-ai-placeholder.appspot.com"
+            },
+            "client": [{
+              "client_info": {
+                "mobilesdk_app_id": "1:000000000000:android:000000000000000000",
+                "android_client_info": { "package_name": "com.creatorflow.ai" }
+              },
+              "oauth_client": [],
+              "api_key": [{ "current_key": "placeholder-key" }],
+              "services": { "appinvite_service": { "other_platform_oauth_client": [] } }
+            }],
+            "configuration_version": "1"
+          }
+          JSONEOF
 
-          if [ -z "$SP" ]; then SP="creatorflow123"; fi
-          if [ -z "$KP" ]; then KP="creatorflow123"; fi
-
-          keytool -list -v \
-            -keystore release.keystore \
-            -alias upload \
-            -storepass "$SP" \
-            -keypass "$KP" | grep "SHA1"
-
-     
-         
-      - name: Build AAB
+      - name: Build Release AAB
         run: ./gradlew bundleProdRelease
 
-      - name: Build APK
+      - name: Build Release APK
         run: ./gradlew assembleProdRelease
 
-      - name: Upload AAB
+      - name: Upload AAB (Play Store)
         uses: actions/upload-artifact@v4
         with:
           name: app-release-aab
           path: app/build/outputs/bundle/prodRelease/*.aab
 
-      - name: Upload APK
+      - name: Upload APK (Direct Install)
         uses: actions/upload-artifact@v4
         with:
           name: app-release-apk
           path: app/build/outputs/apk/prodRelease/*.apk
 
-      - name: Upload mapping
+      - name: Upload ProGuard Mapping
         uses: actions/upload-artifact@v4
         with:
           name: mapping-txt
