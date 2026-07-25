@@ -30,4 +30,10 @@ sealed class Screen(
     data object PaymentHistory : Screen("admin/payments", "Payment History")
     data object Withdrawals : Screen("admin/withdrawals", "Settlements")
     data object InvoiceView : Screen("subscription/invoices", "GST Invoices")
+    data object Onboarding : Screen("onboarding", "Welcome")
+    data object AIChat : Screen("ai_chat", "AI Chat", icon = Icons.Outlined.Chat, selectedIcon = Icons.Filled.Chat)
+    data object Profile : Screen("profile", "Profile", icon = Icons.Outlined.Person, selectedIcon = Icons.Filled.Person)
+    data object YouTubeTools : Screen("youtube_tools", "YT Tools")
+    data object InstagramTools : Screen("instagram_tools", "IG Tools")
+    data object PhoneAuth : Screen("phone_auth", "Phone Sign In")
 }
