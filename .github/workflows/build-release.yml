@@ -3,7 +3,7 @@ name: CreatorFlow AI — Build Release
 on:
   push:
     branches: [main, master]
-    tags: ['v*']
+    tags: ['v']
   workflow_dispatch:
 
 jobs:
@@ -11,37 +11,53 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
           api-level: 34
           build-tools: 34.0.0
+
       - name: Create Keystore
         run: |
-          keytool -genkey -v -keystore release.keystore -alias upload \
-            -keyalg RSA -keysize 2048 -validity 10000 \
-            -storepass $ {{ secrets.KEYSTORE_PASSWORD }} \
-            -keypass $ {{ secrets.KEY_PASSWORD }} \
+          STORE_PASS="$`{ secrets.KEYSTORE_PASSWORD }}"
+          KEY_PASS="$`{ secrets.KEY_PASSWORD }}"
+          if [ -z "$STORE_PASS" ]; then STORE_PASS="creatorflow123"; fi
+          if [ -z "$KEY_PASS" ]; then KEY_PASS="creatorflow123"; fi
+          keytool -genkey -v \
+            -keystore release.keystore \
+            -alias upload \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storepass "$STORE_PASS" \
+            -keypass "$KEY_PASS" \
             -dname "CN=CreatorFlow"
+
       - name: Build AAB
         run: ./gradlew bundleProdRelease
+
       - name: Build APK
         run: ./gradlew assembleProdRelease
+
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
           name: app-release-aab
           path: app/build/outputs/bundle/prodRelease/*.aab
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-release-apk
           path: app/build/outputs/apk/prodRelease/*.apk
+
       - name: Upload mapping
         uses: actions/upload-artifact@v4
         with:
