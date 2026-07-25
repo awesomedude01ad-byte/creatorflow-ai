@@ -33,15 +33,7 @@ jobs:
           KP="${KEY_PASS}"
           if [ -z "$SP" ]; then SP="creatorflow123"; fi
           if [ -z "$KP" ]; then KP="creatorflow123"; fi
-          keytool -genkey -v \
-            -keystore release.keystore \
-            -alias upload \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -storepass "$SP" \
-            -keypass "$KP" \
-            -dname "CN=CreatorFlow"
+          keytool -genkey -v             -keystore release.keystore             -alias upload             -keyalg RSA             -keysize 2048             -validity 10000             -storepass "$SP"             -keypass "$KP"             -dname "CN=CreatorFlow"
 
       - name: Build AAB
         run: ./gradlew bundleProdRelease
