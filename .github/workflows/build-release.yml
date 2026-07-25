@@ -25,19 +25,22 @@ jobs:
           build-tools: 34.0.0
 
       - name: Create Keystore
+        env:
+          STORE_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PAST: ${{ secrets.KEY_PASSWORD }}
         run: |
-          STORE_PASS="$`{ secrets.KEYSTORE_PASSWORD }}"
-          KEY_PASS="$`{ secrets.KEY_PASSWORD }}"
-          if [ -z "$STORE_PASS" ]; then STORE_PASS="creatorflow123"; fi
-          if [ -z "$KEY_PASS" ]; then KEY_PASS="creatorflow123"; fi
+          SP="${STORE_PASS}"
+          KP="${KEY_PASS}"
+          if [ -z "$SP" ]; then SP="creatorflow123"; fi
+          if [ -z "$KP" ]; then KP="creatorflow123"; fi
           keytool -genkey -v \
             -keystore release.keystore \
             -alias upload \
             -keyalg RSA \
             -keysize 2048 \
             -validity 10000 \
-            -storepass "$STORE_PASS" \
-            -keypass "$KEY_PASS" \
+            -storepass "$SP" \
+            -keypass "$KP" \
             -dname "CN=CreatorFlow"
 
       - name: Build AAB
