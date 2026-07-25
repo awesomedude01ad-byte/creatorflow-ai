@@ -1,0 +1,24 @@
+# ─── Git Ignore for CreatorFlow AI ───────────────────────────────
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+# IDE
+.idea/
+*.iml
+*.iws
+# Android
+local.properties
+*.keystore
+J.jks
+google-services.json
+# Build outputs
+captures/
+.externalNativeBuild/
+.cxx/
+# Secrets
+key.properties
+play-store-key.json
+# OS
+.DS_Store
+Thumbs.db
