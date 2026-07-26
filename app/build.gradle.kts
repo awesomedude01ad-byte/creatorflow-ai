@@ -42,14 +42,9 @@ android {
             isDebuggable = true
         }
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            isMinifyEnabled = false
+            isShrinkResources = false
             signingConfig = signingConfigs.getByName("release")
-            firebaseCrashlytics { mappingFileUploadEnabled = true }
         }
     }
 
@@ -80,6 +75,12 @@ android {
         }
         create("prod") {
             dimension = "environment"
+        }
+    }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
 }
