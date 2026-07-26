@@ -1,5 +1,7 @@
 package com.creatorflow.ai.di
 
+import android.app.NotificationManager
+import android.content.Context
 import com.creatorflow.ai.data.repository.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -55,6 +57,10 @@ object AppModule {
 
     @Provides @Singleton
     fun provideNotificationRepository(firestore: FirebaseFirestore): NotificationRepository = NotificationRepositoryImpl(firestore)
+
+    @Provides @Singleton
+    fun provideNotificationManager(app: android.app.Application): NotificationManager =
+        app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     @Provides @Singleton
     fun provideAnalyticsRepository(analytics: FirebaseAnalytics): AnalyticsRepository = AnalyticsRepositoryImpl(analytics)
